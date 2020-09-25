@@ -45,7 +45,7 @@ public class Warenkorb {
         this.userId = userId;
     }
 
-    public BestelltesProdukt findProduktById(Long produktId) {
+    private BestelltesProdukt findProduktById(Long produktId) {
         for (int i = 0; i < produkte.size(); i++) {
             BestelltesProdukt aktuellesProdukt = produkte.get(i);
             if (aktuellesProdukt.getProdukt().getId() == produktId) {

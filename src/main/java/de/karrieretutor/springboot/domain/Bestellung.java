@@ -69,9 +69,18 @@ public class Bestellung {
     public String getGesamtpreis() {
         double gesamtpreis = 0;
         for(BestelltesProdukt p : produkte) {
-            gesamtpreis += p.getProdukt().getPreis();
+            gesamtpreis += p.getProdukt().getPreis() * p.getAnzahl();
         }
         return String.format("%.2f", gesamtpreis);
+
+    }
+
+    public int getGesamtzahl() {
+        int gesamtzahl = 0;
+        for(BestelltesProdukt p : produkte) {
+            gesamtzahl += p.getAnzahl();
+        }
+        return gesamtzahl;
 
     }
 }

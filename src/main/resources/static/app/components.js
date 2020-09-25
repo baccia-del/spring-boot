@@ -66,7 +66,10 @@ const AppHeader = {
 	data: function() {
 		return {
 			lang: lang,
-			warenkorb: {produkte: []}
+			warenkorb: {
+				produkte: [],
+				gesamtzahl: 0
+			}
 		}
 	},
 	watch: {
@@ -74,9 +77,24 @@ const AppHeader = {
 			loadLanguage(newValue).then(() => document.title = i18n.t(this.title))
 		}
 	},
+	methods: {
+		findProduktInWarenkorb: function(produktId) {
+			let gefundenesProdukt
+			for(let warenkorbProdukt of this.warenkorb.produkte) {
+				if(warenkorbProdukt.produkt.id === produktId) {
+					gefundenesProdukt = warenkorbProdukt
+					break
+				}
+			}
+			return gefundenesProdukt
+		}
+	},
 	computed: {
 		cartItems: function() {
-			return this.badge || this.warenkorb.produkte.length
+			console.log('cartItems', this.badge)
+			if (this.badge != null)
+				return this.badge
+			return this.warenkorb.gesamtzahl
 		}
 	},
 	created: function() {

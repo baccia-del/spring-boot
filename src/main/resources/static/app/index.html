@@ -29,6 +29,7 @@
 					produkte:[],
 					warenkorb: {
 						produkte: [],
+						gesamtzahl: 0,
 						gesamtpreis: 0.0
 					},
 					message: "",
@@ -36,15 +37,37 @@
 			},
 			methods: {
 				kaufen: function(id) {
-					this.produkte.forEach((produkt, index, produkte) => {
+					let neuesProdukt
+					this.produkte.forEach(produkt => {
 						if (produkt.id == id) {
-							this.warenkorb.gesamtpreis += produkt.preis
-							this.warenkorb.produkte.push(produkt)
-							this.message = i18n.t('cart.added', [produkt.name])
-							sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
-							return
+							neuesProdukt = produkt
 						}
 					})
+					if (neuesProdukt) {
+						let warenkorbProdukt = this.findProduktInWarenkorb(neuesProdukt.id)
+						if(!warenkorbProdukt) {
+							warenkorbProdukt = {
+								produkt: neuesProdukt,
+								anzahl: 0
+							}
+							this.warenkorb.produkte.push(warenkorbProdukt)
+						}
+						warenkorbProdukt.anzahl++
+						this.warenkorb.gesamtzahl++
+					}
+					this.warenkorb.gesamtpreis += neuesProdukt.preis
+					this.message = i18n.t('cart.added', [neuesProdukt.name])
+					sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
+				},
+				findProduktInWarenkorb: function(produktId) {
+					let gefundenesProdukt
+					for(let warenkorbProdukt of this.warenkorb.produkte) {
+						if(warenkorbProdukt.produkt.id === produktId) {
+							gefundenesProdukt = warenkorbProdukt
+							break
+						}
+					}
+					return gefundenesProdukt
 				}
 			},
 			created: function () {
@@ -64,7 +87,7 @@
 </head>
 <body>
 <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-	<app-header active="index" title="nav.portfolio" :badge="warenkorb.produkte.length"></app-header>
+	<app-header active="index" title="nav.portfolio" :badge="warenkorb.gesamtzahl"></app-header>
 	<drawer></drawer>
 
 	<main class="mdl-layout__content">

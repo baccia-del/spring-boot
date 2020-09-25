@@ -35,6 +35,7 @@
 			data: {
 				warenkorb: {
 					produkte: [],
+					gesamtzahl: 0,
 					gesamtpreis: 0.0
 				},
 				kunde: {
@@ -106,6 +107,7 @@
 							localStorage.setItem('kundenId', kundenId)
 							this.warenkorb = {
 								produkte: [],
+								gesamtzahl: 0,
 								gesamtpreis: 0.0
 							}
 							sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
@@ -114,9 +116,7 @@
 				buildJSON: function () {
 					let data = {
 						kunde: this.kunde,
-						produkte: this.warenkorb.produkte.map(p => {return {
-							produkt: p
-						}})
+						produkte: this.warenkorb.produkte
 					}
 					return data;
 				}
@@ -141,7 +141,7 @@
 </head>
 <body>
 <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header has-drawer is-upgraded">
-	<app-header active="checkout" title="button.checkout" :badge="warenkorb.produkte.length"></app-header>
+	<app-header active="checkout" title="button.checkout" :badge="warenkorb.gesamtzahl"></app-header>
 	<drawer></drawer>
 	<main class="mdl-layout__content">
 		<div class="portfolio-max-width">
@@ -164,24 +164,27 @@
 							<tr>
 								<th width="20%" class="mdl-data-table__cell--non-numeric" v-t="'table.image'"></th>
 								<th class="mdl-data-table__cell--non-numeric" v-t="'table.description'"></th>
+								<th width="20%" v-t="'label.number'"></th>
 								<th width="20%" v-t="'table.price'"></th>
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="produkt in warenkorb.produkte">
+							<tr v-for="p in warenkorb.produkte">
 								<td class="mdl-data-table__cell--non-numeric">
-									<img :src="'fotos/'+produkt.id" :alt="produkt.name" height="30" border="0"/>
+									<img :src="'fotos/'+p.produkt.id" :alt="p.produkt.name" height="30" border="0"/>
 								</td>
-								<td class="mdl-data-table__cell--non-numeric">{{produkt.name}}</td>
-								<td>{{produkt.preisFormatiert}} €</td>
+								<td class="mdl-data-table__cell--non-numeric">{{p.produkt.name}}</td>
+								<td>{{p.anzahl}}</td>
+								<td>{{p.produkt.preisFormatiert}} €</td>
 							</tr>
 							</tbody>
 							<tfoot>
 							<tr>
 								<td></td>
+								<td></td>
 								<td class="mdl-data-table__cell--non-numeric">
 									{{$t('label.total.number')}}
-									{{warenkorb.produkte.length}}
+									{{warenkorb.gesamtzahl}}
 								</td>
 								<td>{{$t('label.total.price')}}
 									{{warenkorb.gesamtpreis}} €

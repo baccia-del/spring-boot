@@ -27,6 +27,7 @@
 			data: {
 				warenkorb:  {
 					produkte:[],
+					gesamtzahl: 0,
 					gesamtpreis: 0.0
 				},
 				message: "",
@@ -42,14 +43,17 @@
 					this.dialogDisplay = 'none'
 				},
 				entfernen: function (id) {
-					this.warenkorb.produkte.forEach((produkt, index, produkte) => {
-						if (produkt.id == id) {
-							this.warenkorb.gesamtpreis -= produkt.preis
-							produkte.splice(index, 1)
-							this.message = i18n.t('cart.removed', [produkt.name])
+					this.warenkorb.produkte.forEach((p, index) => {
+						if (p.produkt.id == id) {
+							p.anzahl--
+							if (p.anzahl === 0)
+								this.warenkorb.produkte.splice(index, 1)
+							// if (this.warenkorb.gesamtzahl > 0)
+								this.warenkorb.gesamtzahl--
+							this.warenkorb.gesamtpreis -= p.produkt.preis
+							this.message = i18n.t('cart.removed', [p.produkt.name])
 							sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
 							this.closeDialog()
-							return
 						}
 					})
 				}
@@ -66,7 +70,7 @@
 </head>
 <body>
 <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header has-drawer is-upgraded">
-	<app-header active="cart" title="nav.cart" :badge="warenkorb.produkte.length"></app-header>
+	<app-header active="cart" title="nav.cart" :badge="warenkorb.gesamtzahl"></app-header>
 	<drawer></drawer>
 
 	<main class="mdl-layout__content">
@@ -74,24 +78,25 @@
 			<h4 v-show="message">{{message}}</h4>
 			<h2 v-if="!warenkorb.produkte.length" v-t="'cart.no.products'"></h2>
 			<div v-else class="mdl-grid">
-				<div v-for="produkt in warenkorb.produkte"
+				<div v-for="p in warenkorb.produkte"
 				     class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--12-col-phone
 				      mdl-card mdl-shadow--4dp portfolio-card">
 					<div class="mdl-card__media">
-						<img :src="'fotos/'+produkt.id" :alt="produkt.name" width="100%" border="0"/>
+						<img :src="'fotos/'+p.produkt.id" :alt="p.produkt.name" width="100%" border="0"/>
 					</div>
 					<div class="mdl-card__title">
-						<h2 class="mdl-card__title-text">{{produkt.name}}</h2>
+						<h2 class="mdl-card__title-text">{{p.produkt.name}}</h2>
 					</div>
 					<div class="mdl-card__supporting-text">
-						<label v-t="'label.origin.short'"></label>      {{produkt.herkunft}}<br/>
-						<label v-t="'label.category.short'"></label>    {{$t(produkt.kategorie)}}<br/>
-						<label v-t="'label.subcategory.short'"></label> {{$t(produkt.unterkategorie)}}<br/>
-						<label v-t="'label.price.short'"></label>       {{produkt.preisFormatiert}} &euro;
+						<label v-t="'label.origin.short'"></label>      {{p.produkt.herkunft}}<br/>
+						<label v-t="'label.category.short'"></label>    {{$t(p.produkt.kategorie)}}<br/>
+						<label v-t="'label.subcategory.short'"></label> {{$t(p.produkt.unterkategorie)}}<br/>
+						<label v-t="'label.price.short'"></label>       {{p.produkt.preisFormatiert}} &euro;
+						<label v-t="'label.number'"></label>            {{p.anzahl}}
 					</div>
 					<div class="mdl-card__actions mdl-card--border">
 						<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--accent"
-						   href="#" @click="showDialog(produkt.id)">
+						   href="#" @click="showDialog(p.produkt.id)">
 							{{$t('button.remove')}}
 							<i class="material-icons">remove_shopping_cart</i>
 						</a>

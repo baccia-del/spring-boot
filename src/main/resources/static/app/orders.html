@@ -65,21 +65,13 @@
 						<th class="right" v-t="'label.order.total'"></th>
 					</tr>
 					</thead>
-					<tbody v-for="bestellung in bestellungen">
-					<tr>
+					<tbody>
+					<tr v-for="bestellung in bestellungen">
 						<td class="centered">{{bestellung.id}}</td>
 						<td><a :href="'order.html?id='+bestellung.id">{{bestellung.datum}}</a></td>
-						<td class="centered">{{bestellung.produkte.length}}</td>
+						<td class="centered">{{bestellung.gesamtzahl}}</td>
 						<td class="right">{{bestellung.gesamtpreis}} €</td>
 					</tr>
-<!--
-					<tr v-for="p in bestellung.produkte" class="">
-						<td class="centered">{{p.id}}</td>
-						<td>{{p.produkt.name}}</td>
-						<td>{{p.produkt.anzahl}}</td>
-						<td class="right">{{p.produkt.preisFormatiert}}</td>
-					</tr>
--->
 					</tbody>
 					<tfoot>
 					<tr>

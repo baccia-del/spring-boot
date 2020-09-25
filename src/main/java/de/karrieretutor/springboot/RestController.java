@@ -63,10 +63,10 @@ public class RestController {
 
     @PostMapping("/bestellen")
     public Long bestellen(@RequestBody Bestellung bestellung) {
-        Kunde kunde = bestellung.getKunde();
-        kundenRepository.save(kunde);
+//        Kunde kunde = bestellung.getKunde();
+//        kundenRepository.save(kunde);
         bestellService.speichere(bestellung, true);
-        return kunde.getId();
+        return bestellung.getKunde().getId();
     }
 
     @GetMapping("/kunde/{id}")

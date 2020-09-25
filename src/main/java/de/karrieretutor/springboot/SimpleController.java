@@ -98,7 +98,7 @@ public class SimpleController {
 
     @GetMapping("/entfernen")
     public String entfernen(@RequestParam Long id, Model model, RedirectAttributes redirect, Locale locale) {
-        String message = messageSource.getMessage("cart.not.found", new String[]{String.valueOf(id)}, locale);
+        String message = messageSource .getMessage("cart.not.found", new String[]{String.valueOf(id)}, locale);
         BestelltesProdukt entferntesProdukt = warenkorb.produktEntfernen(id);
         if (entferntesProdukt != null) {
             message = messageSource.getMessage("cart.removed", new Object[]{entferntesProdukt.getProdukt().getName()}, locale);
