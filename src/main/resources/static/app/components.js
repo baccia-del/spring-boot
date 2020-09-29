@@ -91,7 +91,6 @@ const AppHeader = {
 	},
 	computed: {
 		cartItems: function() {
-			console.log('cartItems', this.badge)
 			if (this.badge != null)
 				return this.badge
 			return this.warenkorb.gesamtzahl
