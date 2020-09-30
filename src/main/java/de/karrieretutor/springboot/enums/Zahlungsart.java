@@ -18,8 +18,8 @@ public enum Zahlungsart {
     }
 
     @JsonValue
-    public int getValue() {
-        return this.ordinal();
+    public String getValue() {
+        return String.valueOf(this.ordinal());
     }
 
 }

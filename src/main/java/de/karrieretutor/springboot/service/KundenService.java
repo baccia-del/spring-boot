@@ -24,14 +24,14 @@ public class KundenService {
     }
 
     @Transactional
-    public Long speichern(Kunde kunde) {
+    public Kunde speichern(Kunde kunde) {
         try {
-            kundeRepository.save(kunde);
+            kunde = kundeRepository.save(kunde);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-            return -1L;
+            return null;
         }
-        return kunde.getId();
+        return kunde;
     }
 
 

@@ -144,18 +144,20 @@
 						body: JSON.stringify(postData)
 					})
 						.then(res => res.json())
-						.then(kundenId => {
-							const msgKey = (kundenId!=-1) ? 'order.success' : 'order.failure'
+						.then(bestellung => {
+							const msgKey = (bestellung.error) ? 'order.failure' : 'order.success'
 							this.message = i18n.t(msgKey)
-							this.kunde.id = kundenId
-							localStorage.setItem('kundenId', kundenId)
-							this.warenkorb = {
-								produkte: [],
-								gesamtzahl: 0,
-								gesamtpreis: 0.0
+							if (bestellung.id) {
+								this.kunde.id = bestellung.kunde.id
+								localStorage.setItem('kundenId', bestellung.kunde.id)
+								this.warenkorb = {
+									produkte: [],
+									gesamtzahl: 0,
+									gesamtpreis: 0.0
+								}
+								sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
+								setTimeout(() => { location.href = 'order.html?id='+bestellung.id }, 1000)
 							}
-							sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
-							setTimeout(() => { location.href = 'orders.html' }, 2000)
 						})
 				},
 				buildJSON: function () {
@@ -190,7 +192,6 @@
 	<drawer></drawer>
 	<main class="mdl-layout__content">
 		<div class="portfolio-max-width">
-			<h4 v-show="message" v-text="message" class="center"></h4>
 			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
         id="buy-button" @click="validierung">
 				{{$t('button.buy.now')}}
@@ -200,6 +201,7 @@
 			</button>
 
 				<form id="adresse" method="post" autocomplete="on" @submit="validierung">
+					<h4 v-show="message" v-html="message" class="center mdl-cell mdl-cell--8-col"></h4>
 					<div class="center mdl-cell mdl-cell--8-col mdl-card mdl-shadow--4dp">
 						<div class="mdl-card__title">
 							<span class="mdl-card__title-text" v-t="'nav.cart'"></span>

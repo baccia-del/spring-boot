@@ -2,6 +2,7 @@ package de.karrieretutor.springboot.service;
 
 import de.karrieretutor.springboot.domain.Bestellung;
 import de.karrieretutor.springboot.domain.BestellungRepository;
+import de.karrieretutor.springboot.domain.Kunde;
 import de.karrieretutor.springboot.enums.BestellStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import java.util.List;
 public class BestellService {
     @Autowired
     BestellungRepository bestellRepository;
+
+    @Autowired
+    KundenService kundenService;
 
     @Transactional(readOnly = true)
     public Bestellung lade(Long id) {
@@ -28,11 +32,16 @@ public class BestellService {
 
     @Transactional()
     public Bestellung speichere(Bestellung bestellung, Boolean istNeu) {
+        Kunde kunde = bestellung.getKunde();
         if (istNeu) {
+            Kunde gespeicherterKunde = kundenService.speichern(kunde);
             bestellung.setDatum(LocalDateTime.now());
             bestellung.setStatus(BestellStatus.OFFEN);
+            gespeicherterKunde.getBestellungen().add(bestellung);
+            bestellung.setKunde(gespeicherterKunde);
+            bestellRepository.save(bestellung);
         }
-        return this.bestellRepository.save(bestellung);
+        return bestellung;
     }
     public Bestellung speichere(Bestellung bestellung) {
         return this.speichere(bestellung, false);

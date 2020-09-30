@@ -53,9 +53,6 @@ public class Bestellung {
     }
     public void setKunde(Kunde kunde) {
         this.kunde = kunde;
-        if (!this.kunde.getBestellungen().contains(this)) {
-            this.kunde.getBestellungen().add(this);
-        }
     }
 
     public List<BestelltesProdukt> getProdukte() {
