@@ -52,12 +52,12 @@ public class EmailService {
         }
         String empfaenger = kunde.getEmail();
         String betreff = messageSource.getMessage("email.subject",
-                new Object[]{ bestellung.getId(), bestellung.getGesamtzahl() }, locale);
+                new Object[]{bestellung.getId(), bestellung.getGesamtzahl()}, locale);
 
         final Context ctx = new Context(locale);
         ctx.setVariable("bestellung", bestellung);
         ctx.setVariable("kunde", kunde);
-        final String htmlContent = this.templateEngine.process(sprache + "/versand.html", ctx);
+        final String htmlContent = this.templateEngine.process("mail/" + sprache + "/versand.html", ctx);
 
         try {
             sendMessageWithAttachment(empfaenger, betreff, htmlContent);
