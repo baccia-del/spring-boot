@@ -68,7 +68,7 @@ public class RestController {
     @PostMapping("/bestellen")
     public Bestellung bestellen(@RequestBody Bestellung bestellung) {
         Bestellung neueBestellung = bestellService.speichere(bestellung, true);
-        emailService.versandBestaetigung(neueBestellung);
+        emailService.versandHTML(neueBestellung);
         return neueBestellung;
     }
 

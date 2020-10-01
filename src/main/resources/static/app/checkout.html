@@ -46,6 +46,7 @@
 					plz: '',
 					ort: '',
 					email: '',
+					sprache: localStorage.getItem(LANG),
 					zahlungsart: '',
 					iban: '',
 					kreditkartenNr: ''
@@ -156,11 +157,12 @@
 									gesamtpreis: 0.0
 								}
 								sessionStorage.setItem(WARENKORB, JSON.stringify(this.warenkorb))
-								setTimeout(() => { location.href = 'order.html?id='+bestellung.id }, 1000)
+								setTimeout(() => { location.href = 'order.html?id='+bestellung.id }, 1500)
 							}
 						})
 				},
 				buildJSON: function () {
+					this.kunde.sprache = localStorage.getItem(LANG)
 					let data = {
 						kunde: this.kunde,
 						produkte: this.warenkorb.produkte

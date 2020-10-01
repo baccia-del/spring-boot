@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Versandbestätigung</title>
+</head>
+<body>
+
+<p>Hallo <span th:text="${kunde.nameFormatiert}"></span>,<br/>
+	<br/>
+	Ihre Bestellung Nr. <span th:text="${bestellung.id}"></span> wurde versendet.</p>
+
+<p>Die Lieferung enthält folgende Artikel:<br/>
+	<div th:each="bp : ${bestellung.produkte}">
+		Bezeichnung: <span th:text="${bp.produkt.name}"></span>,
+		Preis: <span th:text="${bp.produkt.preisFormatiert}"></span>€,
+		Anzahl: <span th:text="${bp.anzahl}"></span>
+	</div>
+	Gesamtzahl bestellter Produkte: <span th:text="${bestellung.gesamtzahl}"></span>,
+	Gesamtpreis: <span th:text="${bestellung.gesamtpreis}"></span><br/>
+</p>
+<p>Es kann keine Änderung mehr an Ihrer Bestellung vorgenommen werden, da sie	sich bereits im Versand befindet</p>
+
+<p>Ihre Bestellung sollte in den nächsten 3 Werktage bei Ihnen ankommen.<br/>
+	Versendet wurde an folgende Adresse:<br/>
+	<span th:text="${kunde.nameFormatiert}"></span><br/>
+	<span th:text="${kunde.strasse}"></span><br/>
+	<span th:text="${kunde.plz}"></span> <span th:text="${kunde.ort}"></span>
+</p>
+
+<p>Zahlungsart:<br/>
+	<span th:text="${kunde.zahlungsart}"></span>
+</p>
+
+Mit freundlichen Grüßen,<br/>
+IhrDemo-Shop-Team
+</body>
+</html>
