@@ -43,6 +43,10 @@ public class Kunde {
     public void setVorname(String vorname) {
         this.vorname = vorname;
     }
+    public String getNameFormatiert() {
+        return vorname + " " + nachname;
+    }
+
 
     public String getNachname() {
         return nachname;

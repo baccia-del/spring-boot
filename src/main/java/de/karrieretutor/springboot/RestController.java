@@ -5,6 +5,7 @@ import de.karrieretutor.springboot.domain.Kunde;
 import de.karrieretutor.springboot.domain.KundenRepository;
 import de.karrieretutor.springboot.domain.Produkt;
 import de.karrieretutor.springboot.service.BestellService;
+import de.karrieretutor.springboot.service.EmailService;
 import de.karrieretutor.springboot.service.ProduktService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,9 @@ public class RestController {
     @Autowired
     BestellService bestellService;
 
+    @Autowired
+    EmailService emailService;
+
     @GetMapping("/produkte")
     public List<Produkt> ladeProdukte() {
         return produktService.ladeProdukte();
@@ -64,6 +68,7 @@ public class RestController {
     @PostMapping("/bestellen")
     public Bestellung bestellen(@RequestBody Bestellung bestellung) {
         Bestellung neueBestellung = bestellService.speichere(bestellung, true);
+        emailService.versandBestaetigung(neueBestellung);
         return neueBestellung;
     }
 
