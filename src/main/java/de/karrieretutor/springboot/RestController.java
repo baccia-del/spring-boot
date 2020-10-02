@@ -6,6 +6,7 @@ import de.karrieretutor.springboot.domain.KundenRepository;
 import de.karrieretutor.springboot.domain.Produkt;
 import de.karrieretutor.springboot.service.BestellService;
 import de.karrieretutor.springboot.service.EmailService;
+import de.karrieretutor.springboot.service.KundenService;
 import de.karrieretutor.springboot.service.ProduktService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 @org.springframework.web.bind.annotation.RestController
@@ -38,6 +38,9 @@ public class RestController {
 
     @Autowired
     KundenRepository kundenRepository;
+
+    @Autowired
+    KundenService kundenService;
 
     @Autowired
     BestellService bestellService;
@@ -74,14 +77,12 @@ public class RestController {
 
     @GetMapping("/kunde/{id}")
     public Kunde kundeLaden(@PathVariable Long id) {
-        Kunde kunde = new Kunde();
-        if (id != null) {
-            Optional<Kunde> kundeDB = kundenRepository.findById(id);
-            if (kundeDB.isPresent()) {
-                kunde = kundeDB.get();
-            }
-        }
-        return kunde;
+        return kundenService.lade(id);
+    }
+
+    @PostMapping("/speichern")
+    public Kunde speichern(@RequestBody Kunde kunde) {
+        return kundenService.speichern(kunde);
     }
 
     @GetMapping("/bestellung/{id}")

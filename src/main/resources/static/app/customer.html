@@ -24,6 +24,7 @@
 			new Vue({
 				i18n: i18n,
 				el: '#app',
+				mixins: [Validation],
 				components: {
 					'app-header': AppHeader,
 					'drawer': Drawer,
@@ -31,31 +32,13 @@
 				},
 				data: {
 					disabled: true,
-					kunde: {
-						id: '',
-						vorname: '',
-						nachname: '',
-						strasse: '',
-						plz: '',
-						ort: '',
-						zahlungsart: null,
-						iban: '',
-						kreditkartenNr: '',
-						email: ''
-					},
 					message: ''
 				},
 				methods: {
 					validierung: function (e) {
-						let isValid = true
-						for (const key in this.isInvalid) {
-							if (!this.kunde[key]) {
-								this.isInvalid[key] = true
-								isValid = false
-							}
-						}
+						const isValid = this.validate(e)
 						if (isValid) {
-							this.bestellen()
+							this.speichern()
 						}
 					},
 					toggle: function (value) {
@@ -68,9 +51,9 @@
 							body: JSON.stringify(this.kunde)
 						})
 							.then(res => res.json())
-							.then(kundenId => {
+							.then(kunde => {
 								this.disabled = true
-								const msgKey = (kundenId != -1) ? 'customer.success' : 'customer.failure'
+								const msgKey = (kunde.error) ? 'customer.failure' : 'customer.success'
 								this.message = i18n.t(msgKey)
 							})
 					}
@@ -93,16 +76,14 @@
 <body>
 
 <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header has-drawer is-upgraded">
-	<app-header active="order" title="order.title"></app-header>
+	<app-header active="customer" title="nav.account"></app-header>
 	<drawer></drawer>
 
 	<main class="mdl-layout__content">
 		<div class="portfolio-max-width">
-
-
 			<div id="buy-button">
 				<button type="button" v-if="disabled"
-				        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+				        class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
 				        @click="toggle(false)">
 					{{$t('button.edit')}}
 					<span class="mdl-button__ripple-container">
@@ -111,7 +92,7 @@
 				</button>
 
 				<button type="button" v-if="!disabled"
-				        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+				        class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
 				        @click="toggle(true)">
 					{{$t('button.abort')}}
 					<span class="mdl-button__ripple-container">
@@ -120,104 +101,104 @@
 				</button>
 
 				<button type="button" v-if="!disabled"
-				        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-				        @click="speichern">
-					{{$t('button.customer.save')}}
+				        class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
+				        @click="validierung">
+					{{$t('button.save')}}
 					<span class="mdl-button__ripple-container">
 					<span class="mdl-ripple"></span>
 				</span>
 				</button>
 			</div>
 
-
 			<form id="adresse" method="post" autocomplete="on" @submit="validierung">
-
-				<div class="center mdl-cell mdl-cell--6-col">
+				<div class="center mdl-cell mdl-cell--8-col">
 					<h4 v-show="message" v-html="message"></h4>
 					<div class="mdl-card mdl-shadow--4dp">
-
 						<div class="mdl-card__title">
-							<H4>
-								<div class="mdl-card__title-text" v-t="'title.shipping.address'"></div>
-							</H4>
+							<H4 class="mdl-card__title-text" v-t="'title.shipping.address'"></H4>
 						</div>
-
 						<div class="mdl-card__supporting-text">
 							<input type="hidden" id="id" v-model="kunde.id">
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label has-placeholder">
-								<input class="mdl-textfield__input" v-model="kunde.vorname" placeholder=""
-								       :disabled="disabled"></input>
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+							     :class="{'is-disabled':disabled, 'is-invalid':isInvalid.vorname}">
+								<input class="mdl-textfield__input" v-model="kunde.vorname" placeholder="" :disabled="disabled">
 								<label class="mdl-textfield__label" v-t="'label.shipping.prename'"></label>
+								<span class="mdl-textfield__error" v-t="'validation.adresse.vorname'"></span>
 							</div>
 
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label has-placeholder">
-								<input class="mdl-textfield__input" v-model="kunde.nachname" placeholder=""
-								       :disabled="disabled"></input>
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+							     :class="{'is-disabled':disabled, 'is-invalid':isInvalid.nachname}">
+								<input class="mdl-textfield__input" v-model="kunde.nachname" placeholder="" :disabled="disabled"></input>
 								<label class="mdl-textfield__label" v-t="'label.shipping.name'"></label>
+								<span class="mdl-textfield__error" v-t="'validation.adresse.nachname'"></span>
 							</div>
 
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label has-placeholder"
-							     style="width:604px">
-								<input class="mdl-textfield__input" v-model="kunde.strasse" placeholder=""
-								       :disabled="disabled"></input>
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+							     :class="{'is-disabled':disabled, 'is-invalid':isInvalid.strasse}" style="width:604px">
+								<input class="mdl-textfield__input" v-model="kunde.strasse" placeholder="" :disabled="disabled"></input>
 								<label class="mdl-textfield__label" v-t="'label.shipping.address'"></label>
+								<span class="mdl-textfield__error" v-t="'validation.adresse.strasse'"></span>
 							</div>
 							<br>
 
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label has-placeholder">
-								<input class="mdl-textfield__input" v-model="kunde.plz" placeholder=""
-								       :disabled="disabled"></input>
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+							     :class="{'is-disabled':disabled, 'is-invalid':isInvalid.plz}">
+								<input class="mdl-textfield__input" v-model="kunde.plz" placeholder="" :disabled="disabled"></input>
 								<label class="mdl-textfield__label" v-t="'label.shipping.zip'"></label>
+								<span class="mdl-textfield__error" v-t="'validation.adresse.plz'"></span>
 							</div>
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label has-placeholder">
-								<input class="mdl-textfield__input" v-model="kunde.ort" placeholder=""
-								       :disabled="disabled"></input>
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
+							     :class="{'is-disabled':disabled, 'is-invalid':isInvalid.ort}">
+								<input class="mdl-textfield__input" v-model="kunde.ort" placeholder="" :disabled="disabled"></input>
 								<label class="mdl-textfield__label" v-t="'label.shipping.city'"></label>
+								<span class="mdl-textfield__error" v-t="'validation.adresse.ort'"></span>
 							</div>
 						</div>
 
 					</div>
 
-					<div id="payment" class="center mdl-cell mdl-cell--6-col mdl-card mdl-shadow--4dp">
+					<div id="payment" class="center mdl-cell mdl-cell--8-col mdl-card mdl-shadow--4dp">
 						<div class="mdl-card__title">
-							<div class="mdl-card__title-text" v-t="'title.shipping.payment'"></div>
+							<h4 class="mdl-card__title-text" v-t="'title.shipping.payment'"></h4>
 						</div>
-						<div class="mdl-textfield" style="margin-top:-2.5em; padding-left:16px">
+						<div class="mdl-textfield" style="margin-top:-2.5em">
 							<span class="mdl-textfield__error" v-t="'validation.zahlungsart.zahlungsart'"></span>
 						</div>
 
-						<div class="mdl-card__supporting-text" style="margin-top:0; padding-top:0">
-							<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+						<div class="mdl-card__supporting-text">
+							<label for="list-option-1" class="mdl-radio" :class="{'is-disabled':disabled}">
 								<input type="radio" id="list-option-1" class="mdl-radio__button" name="options"
-								       v-model="kunde.zahlungsart" value="0"/>
+								       v-model="kunde.zahlungsart" value="0" :disabled="disabled"/>
 								<span class="mdl-radio__label" v-t="'enum.payment.1'"></span>
 							</label>
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
-								<input class="mdl-textfield__input" type="text" id="iban" v-model="kunde.iban">
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" :class="{'is-disabled':disabled}">
+								<input class="mdl-textfield__input" type="text" id="iban" v-model="kunde.iban"
+								       placeholder="" :disabled="disabled">
 								<label class="mdl-textfield__label" for="iban" v-t="'label.payment.iban'"></label>
 								<span class="mdl-textfield__error" v-t="'validation.zahlungsart.iban'"></span>
-							</div>
+							</div><br/>
 
-							<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-2">
+							<label for="list-option-2" class="mdl-radio" :class="{'is-disabled':disabled}">
 								<input type="radio" id="list-option-2" class="mdl-radio__button" name="options"
-								       v-model="kunde.zahlungsart" value="1">
+								       v-model="kunde.zahlungsart" value="1" :disabled="disabled">
 								<span class="mdl-radio__label" v-t="'enum.payment.2'"></span>
 							</label>
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" :class="{'is-disabled':disabled}">
 								<input class="mdl-textfield__input" type="text" id="kreditkarte"
-								       v-model="kunde.kreditkartenNr">
+								       v-model="kunde.kreditkartenNr" placeholder="" :disabled="disabled">
 								<label class="mdl-textfield__label" for="kreditkarte"
 								       v-t="'label.payment.card.nr'"></label>
 								<span class="mdl-textfield__error" v-t="'validation.zahlungsart.karte'"></span>
-							</div>
+							</div><br/>
 
-							<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-3">
+							<label for="list-option-3" class="mdl-radio" :class="{'is-disabled':disabled}">
 								<input type="radio" id="list-option-3" class="mdl-radio__button" name="options"
-								       v-model="kunde.zahlungsart" value="2">
+								       v-model="kunde.zahlungsart" value="2" :disabled="disabled">
 								<span class="mdl-radio__label" v-t="'enum.payment.3'"></span>
 							</label>
-							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
-								<input class="mdl-textfield__input" type="text" id="email" v-model="kunde.email">
+							<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" :class="{'is-disabled':disabled}">
+								<input class="mdl-textfield__input" type="text" id="email"
+								       v-model="kunde.email" placeholder="" :disabled="disabled">
 								<label class="mdl-textfield__label" for="email" v-t="'label.payment.email'"></label>
 								<span class="mdl-textfield__error" v-t="'validation.zahlungsart.email'"></span>
 							</div>

@@ -75,23 +75,24 @@
 							isValid = false
 						}
 					}
-					switch (this.kunde.zahlungsart) {
-						case null:
-							isValid = false
-							this.isInvalid.zahlungsart = true
-							break
-						case '0':
-							this.isInvalid.zahlungsart = false
-							this.isInvalid.kreditkartenNr = false
-							isValid = (this.kunde.iban != '' && this.isValidIBANNumber(this.kunde.iban) == 1)
-							this.isInvalid.iban = !isValid
-							break
-						case '1':
-							this.isInvalid.zahlungsart = false
-							this.isInvalid.iban = false
-							isValid = (this.kunde.kreditkartenNr != '' && this.visaCard(this.kunde.kreditkartenNr))
-							this.isInvalid.kreditkartenNr = !isValid
-							console.log('kreditkartenNr', this.kunde.kreditkartenNr, 'isInvalid', this.isInvalid.kreditkartenNr)
+					if (isValid) {
+						switch (this.kunde.zahlungsart) {
+							case null:
+								isValid = false
+								this.isInvalid.zahlungsart = true
+								break
+							case '0':
+								this.isInvalid.zahlungsart = false
+								this.isInvalid.kreditkartenNr = false
+								isValid = (this.kunde.iban != '' && this.isValidIBANNumber(this.kunde.iban) == 1)
+								this.isInvalid.iban = !isValid
+								break
+							case '1':
+								this.isInvalid.zahlungsart = false
+								this.isInvalid.iban = false
+								isValid = (this.kunde.kreditkartenNr != '' && this.visaCard(this.kunde.kreditkartenNr))
+								this.isInvalid.kreditkartenNr = !isValid
+						}
 					}
 					if (isValid) {
 						this.bestellen()
