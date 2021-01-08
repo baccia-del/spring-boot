@@ -1,7 +1,5 @@
 package de.karrieretutor.springboot.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
@@ -9,15 +7,13 @@ public class BestelltesProdukt {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @JsonIgnore
     @ManyToOne
     private Bestellung bestellung;
 
+    private Integer anzahl = 0;
     @ManyToOne
     private Produkt produkt;
 
-    private int anzahl;
 
     public Long getId() {
         return id;
@@ -33,18 +29,18 @@ public class BestelltesProdukt {
         this.bestellung = bestellung;
     }
 
+    public Integer getAnzahl() {
+        return anzahl;
+    }
+    public void setAnzahl(Integer anzahl) {
+        this.anzahl = anzahl;
+    }
+
     public Produkt getProdukt() {
         return produkt;
     }
     public void setProdukt(Produkt produkt) {
         this.produkt = produkt;
-    }
-
-    public int getAnzahl() {
-        return anzahl;
-    }
-    public void setAnzahl(int anzahl) {
-        this.anzahl = anzahl;
     }
 
     public void hinzufuegen() {
@@ -61,7 +57,7 @@ public class BestelltesProdukt {
         return "BestelltesProdukt{" +
                 "id=" + id +
                 ", bestellung=" + bestellung +
-                ", produkt=" + produkt.toString() +
+                ", produkt=" + produkt.getId() +
                 ", anzahl=" + anzahl +
                 '}';
     }

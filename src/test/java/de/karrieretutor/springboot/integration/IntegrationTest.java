@@ -21,10 +21,10 @@ class IntegrationTest {
     @Test
     void kaufen() throws Exception {
         mvc.perform(get("/kaufen")
-                .param("id", "1"))
+                .param("id", "2"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("index.html"))
-                .andExpect(flash().attribute("message", "Produkt \"Java-Kurs\" zum Warenkorb hinzugefügt."));
+                .andExpect(flash().attribute("message", "Produkt \"Gran Vendema\" zum Warenkorb hinzugefügt."));
     }
 
     @Test
@@ -39,11 +39,11 @@ class IntegrationTest {
     @Test
     void entfernen() throws Exception {
         mvc.perform(get("/kaufen")
-                .param("id", "1"));
+                .param("id", "2"));
         mvc.perform(get("/entfernen")
-                .param("id", "1"))
+                .param("id", "2"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/warenkorb.html"))
-                .andExpect(flash().attribute("message", "Produkt \"Java-Kurs\" vom Warenkorb entfernt."));
+                .andExpect(redirectedUrl("/cart.html"))
+                .andExpect(flash().attribute("message", "Produkt \"Gran Vendema\" vom Warenkorb entfernt."));
     }
 }

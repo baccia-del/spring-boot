@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,27 +36,39 @@ public class ProduktService {
         return findProdukt(id);
     }
 
-    public void updateProdukt(Produkt neuesProdukt) {
+    public void updateProdukt(Produkt produkt) {
+        Produkt neuesProdukt = produktRepository.save(produkt);
         LOG.info("updating product: " + neuesProdukt.getId());
         Produkt cachedProdukt = findProdukt(neuesProdukt.getId());
         if (cachedProdukt != null) {
-            Collections.replaceAll(cachedProdukte, cachedProdukt, neuesProdukt);
+            cachedProdukte.set(cachedProdukte.indexOf(cachedProdukt), neuesProdukt);
         } else {
             cachedProdukte.add(neuesProdukt);
         }
     }
 
-    public void deleteProdukt(Long id) {
+    public String deleteProdukt(Long id) {
         LOG.info("deleting product: " + id);
-        Produkt delProdukt = findProdukt(id);
-        if (delProdukt != null) {
-            cachedProdukte.remove(delProdukt);
+        Optional<Produkt> produktDB = produktRepository.findById(id);
+        if (produktDB.isPresent()) {
+            Produkt loeschProdukt = produktDB.get();
+            produktRepository.delete(loeschProdukt);
+            Produkt cachedProdukt = findProdukt(id);
+            if (cachedProdukt != null) {
+                cachedProdukte.remove(cachedProdukt);
+            }
+            return loeschProdukt.getName();
         }
+        return null;
     }
 
-    private Produkt findProdukt(Long id) {
+    public Produkt findProdukt(Long id) {
+        if (id == null) return null;
+        if (cachedProdukte.isEmpty()) {
+            cachedProdukte = ladeProdukte();
+        }
         Optional<Produkt> optional = cachedProdukte.stream().filter(p -> p.getId() == id).findFirst();
-        return optional.isPresent()? optional.get() : null;
+        return optional.isPresent() ? optional.get() : null;
     }
 
 

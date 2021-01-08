@@ -1,14 +1,20 @@
 package de.karrieretutor.springboot.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.karrieretutor.springboot.Const;
 import de.karrieretutor.springboot.enums.Zahlungsart;
+import org.springframework.validation.BindingResult;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static de.karrieretutor.springboot.Const.CUSTOMER;
 import static javax.persistence.CascadeType.ALL;
+
 
 @Entity
 public class Kunde {
@@ -16,22 +22,43 @@ public class Kunde {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "{validation.adresse.vorname}")
     private String vorname;
+
+    @NotBlank(message = "{validation.adresse.nachname}")
     private String nachname;
+
+    @NotBlank(message = "{validation.adresse.strasse}")
     private String strasse;
+
+    @NotBlank(message = "{validation.adresse.plz}")
     private String plz;
+
+    @NotBlank(message = "{validation.adresse.ort}")
     private String ort;
 
+    @NotNull(message = "{validation.zahlungsart.zahlungsart}")
     private Zahlungsart zahlungsart;
+
     private String iban;
     private String kreditkartenNr;
+
+    @Email
+    @NotBlank(message = "{validation.zahlungsart.email}")
     private String email;
+    private String password;
 
     private String sprache = Locale.GERMAN.getLanguage();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "kunde", cascade = ALL)
+    @OneToMany(mappedBy = CUSTOMER, cascade = ALL)
     private List<Bestellung> bestellungen = new ArrayList<>();
+
+    public Kunde() {}
+
+    public Kunde(String email, String passwort) {
+        this.email = email;
+        this.password = passwort;
+    }
 
     public Long getId() {
         return id;
@@ -49,7 +76,6 @@ public class Kunde {
     public String getNameFormatiert() {
         return vorname + " " + nachname;
     }
-
 
     public String getNachname() {
         return nachname;
@@ -114,11 +140,35 @@ public class Kunde {
         this.sprache = sprache;
     }
 
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public List<Bestellung> getBestellungen() {
         return bestellungen;
     }
     public void setBestellungen(List<Bestellung> bestellungen) {
         this.bestellungen = bestellungen;
+    }
+
+
+    // TODO: implementieren
+    @Transient
+    public boolean validiereZahlungsart(BindingResult result) {
+        return false;
+    }
+
+    // TODO: implementieren
+    private boolean validiereIBAN() {
+        return false;
+    }
+
+    // TODO: implementieren
+    private boolean validiereKreditkartenNr() {
+        return false;
     }
 
     @Override

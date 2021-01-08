@@ -1,8 +1,11 @@
 package de.karrieretutor.springboot.domain;
 
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class Warenkorb {
     private List<BestelltesProdukt> produkte = new ArrayList<>();
     private Long userId;
@@ -31,8 +34,7 @@ public class Warenkorb {
 
     public int getGesamtzahl() {
         int gesamtzahl = 0;
-        for(int i=0; i<produkte.size(); i++) {
-            BestelltesProdukt p = produkte.get(i);
+        for(BestelltesProdukt p : produkte) {
             gesamtzahl += p.getAnzahl();
         }
         return gesamtzahl;
@@ -65,14 +67,14 @@ public class Warenkorb {
         warenkorbProdukt.hinzufuegen();
     }
 
-    public BestelltesProdukt produktEntfernen(Long produktId) {
+    public Produkt produktEntfernen(Long produktId) {
         BestelltesProdukt warenkorbProdukt = findProduktById(produktId);
         if (warenkorbProdukt != null) {
             warenkorbProdukt.entfernen();
             if (warenkorbProdukt.getAnzahl() == 0) {
                 produkte.remove(warenkorbProdukt);
             }
-            return warenkorbProdukt;
+            return warenkorbProdukt.getProdukt();
         }
         return null;
     }

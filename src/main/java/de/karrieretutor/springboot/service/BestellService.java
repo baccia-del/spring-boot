@@ -1,48 +1,65 @@
 package de.karrieretutor.springboot.service;
 
-import de.karrieretutor.springboot.domain.Bestellung;
-import de.karrieretutor.springboot.domain.BestellungRepository;
-import de.karrieretutor.springboot.domain.Kunde;
+import de.karrieretutor.springboot.domain.*;
 import de.karrieretutor.springboot.enums.BestellStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class BestellService {
     @Autowired
     BestellungRepository bestellRepository;
-
     @Autowired
     KundenService kundenService;
+    @Autowired
+    ProduktService produktService;
 
     @Transactional(readOnly = true)
-    public Bestellung lade(Long id) {
-        return this.bestellRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Order not found for ID: " + id));
+    public Bestellung lade(Long kundenId, Long id) {
+        Bestellung bestellung = this.bestellRepository.findById(id).orElse(null);
+        // prüfe, ob es der gleiche Kunde ist
+        if (bestellung != null && bestellung.getKunde().getId().equals(kundenId)) {
+            return bestellung;
+        }
+        return null;
     }
 
     @Transactional(readOnly = true)
     public List<Bestellung> bestellungenVonKunde(Long kundenId) {
-        return this.bestellRepository.findByKundeId(kundenId);
+        List<Bestellung> bestellungen = bestellRepository.findByKundeId(kundenId);
+        if (bestellungen == null)
+            bestellungen = new ArrayList<Bestellung>();
+        return bestellungen;
     }
 
     @Transactional()
     public Bestellung speichere(Bestellung bestellung, Boolean istNeu) {
         Kunde kunde = bestellung.getKunde();
         if (istNeu) {
-            Kunde gespeicherterKunde = kundenService.speichern(kunde);
-            bestellung.setDatum(LocalDateTime.now());
-            bestellung.setStatus(BestellStatus.OFFEN);
-            gespeicherterKunde.getBestellungen().add(bestellung);
-            bestellung.setKunde(gespeicherterKunde);
-            bestellRepository.save(bestellung);
+            kundenService.speichern(kunde);
         }
-        return bestellung;
+        bestellung.setDatum(LocalDateTime.now());
+        bestellung.setStatus(BestellStatus.OFFEN);
+        ladeProduktdetails(bestellung);
+        Bestellung neueBestellung = bestellRepository.save(bestellung);
+        // Kundendaten aus der Datenbank laden
+        neueBestellung.setKunde(kundenService.lade(kunde.getId()));
+        return neueBestellung;
     }
+
+    private void ladeProduktdetails(Bestellung bestellung) {
+        for(BestelltesProdukt bp : bestellung.getProdukte()) {
+            Produkt produktDetails = produktService.getProdukt(bp.getProdukt().getId());
+            bp.setProdukt(produktDetails);
+            bp.setBestellung(bestellung);
+        }
+    }
+
     public Bestellung speichere(Bestellung bestellung) {
         return this.speichere(bestellung, false);
     }

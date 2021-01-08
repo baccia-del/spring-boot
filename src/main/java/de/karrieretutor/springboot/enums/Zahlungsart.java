@@ -1,7 +1,5 @@
 package de.karrieretutor.springboot.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 public enum Zahlungsart {
     EINZUG("enum.payment.1"),
     KREDITKARTE("enum.payment.2"),
@@ -16,10 +14,4 @@ public enum Zahlungsart {
     public String getMessageKey() {
         return messageKey;
     }
-
-    @JsonValue
-    public String getValue() {
-        return String.valueOf(this.ordinal());
-    }
-
 }

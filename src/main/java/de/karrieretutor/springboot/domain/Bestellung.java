@@ -1,13 +1,14 @@
 package de.karrieretutor.springboot.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import de.karrieretutor.springboot.enums.BestellStatus;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.karrieretutor.springboot.Const.ORDER;
 import static javax.persistence.CascadeType.ALL;
 
 @Entity
@@ -16,15 +17,14 @@ public class Bestellung {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonFormat(pattern = "dd.MM.yyyy hh:mm")
     private LocalDateTime datum;
-
     private BestellStatus status;
 
+    @Valid
     @ManyToOne
     private Kunde kunde;
 
-    @OneToMany(mappedBy = "bestellung", cascade = ALL)
+    @OneToMany(mappedBy = ORDER, cascade = ALL)
     private List<BestelltesProdukt> produkte = new ArrayList<>();
 
     public Long getId() {
@@ -59,7 +59,6 @@ public class Bestellung {
         return produkte;
     }
     public void setProdukte(List<BestelltesProdukt> produkte) {
-        produkte.forEach(p -> p.setBestellung(this));
         this.produkte = produkte;
     }
 
@@ -79,5 +78,19 @@ public class Bestellung {
         }
         return gesamtzahl;
 
+    }
+
+    @Override
+    public String toString() {
+        String result = "Bestellung{" +
+                "id=" + id +
+                ", datum=" + datum +
+                ", status=" + status +
+                ", kunde=" + kunde.getId() +
+                ", produkte=[";
+        for (BestelltesProdukt p : produkte)
+            result += "id:"+p.getProdukt().getId() + ", anzahl:" + p.getAnzahl();
+        result += "]\n}";
+        return result;
     }
 }
